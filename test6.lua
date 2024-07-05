@@ -266,6 +266,8 @@ end
 
 
 local function UpdateItemTable()
+    Items = {}
+    
     for i, v in ItemsFolder:GetChildren() do
         if v and v:FindFirstChild('ItemPickupScript') and v:FindFirstChild('ClickDetector') then
             Items[v.Name] = v
@@ -279,7 +281,7 @@ end
 ESP_Tabs['ItemSection']:AddToggle({
     Name = 'Item ESP',
     Flag = 'Item-ESP-Body-Enabled-Toggle',
-    Callback = function(Toggle)
+    Callback = function(Toggle)    
         UpdateItemTable()
         IsEnabled = Toggle
         ToggleItemESP(IsEnabled)
@@ -293,6 +295,7 @@ UpdateItemTable()
 ItemsFolder.ChildAdded:Connect(function(child)
     UpdateItemTable()
     OnItemAdded(child)
+    print('Item added: ' .. tostring(child.Name) .. ' {HasESP: ' .. tostring(child:FindFirstChild('ESP').Name) .. '}')
 end)
 ItemsFolder.ChildRemoved:Connect(function(child)
     UpdateItemTable()
@@ -300,6 +303,4 @@ ItemsFolder.ChildRemoved:Connect(function(child)
 end)
 
 
-
-
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test4.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test6.lua', true))()
