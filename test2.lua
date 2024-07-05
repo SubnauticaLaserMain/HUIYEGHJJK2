@@ -51,7 +51,7 @@ local ESP_Options = {
 local ESP_Table_Players = {}
 
 local function ESP_Script()
-    local Players = PlayerSection:GetPlayers()
+    local Players = PlayerService:GetPlayers()
 
 
     for i, v in pairs(Players) do
@@ -72,17 +72,21 @@ end
 
 
 local function RemoveAllESP()
-    local Players = PlayerSection:GetPlayers()
+    local Players = PlayerService:GetPlayers()
 
 
     for i, v in pairs(Players) do
-        if v ~= Players.LocalPlayer then
-            local Character = v.Character and v.CharacterAdded:Wait()
+        if v ~= PlayerService.LocalPlayer then
+            local Character = v.Character or v.CharacterAdded:Wait()
 
             if Character and Character:FindFirstChild('ESP') then
-                local ESP = Character:FindFirstChild('ESP')
+                local ESP = Character.ESP;
 
                 ESP:Destroy()
+
+                print('Removing ESP Object from: ' .. tostring(Character:GetFullName()))
+                
+
                 ESP_Table_Players[v.Name] = nil
             end
         end
@@ -161,4 +165,4 @@ local PlayerESP_ColorPicker_ESPColor = ESP_Tabs['PlayerSection']:AddColorPicker(
 
 
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/Piggy.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test6.lua', true))()
