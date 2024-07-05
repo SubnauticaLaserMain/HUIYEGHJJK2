@@ -211,11 +211,10 @@ local IsEnabled = false
 local function OnItemAdded(Item)
     if Item and IsEnabled == true then
         if Item:FindFirstChild('ItemPickupScript') and Item:FindFirstChild('ClickDetector') then
-            if not Item:FindFirstChild('ESP') then
-                local ESP = Instance.new('Highlight', Item)
-                ESP.Name = 'ESP'
-                ESP.FillColor = Color3.fromHex(Item.Color:ToHex())
-            end
+            local ESP = Instance.new('Highlight', Item)
+            ESP.Name = 'ESP'
+            ESP.FillColor = Color3.fromHex(Item.Color:ToHex())        
+            print('Step is adding ItemESP to: ' .. tostring(ESP:GetFullName()))
         end
     end
 end
@@ -285,6 +284,10 @@ ESP_Tabs['ItemSection']:AddToggle({
         UpdateItemTable()
         IsEnabled = Toggle
         ToggleItemESP(IsEnabled)
+
+        while wait(0.5) and Toggle do
+            UpdateItemTable()
+        end
     end
 })
 
@@ -303,4 +306,4 @@ ItemsFolder.ChildRemoved:Connect(function(child)
 end)
 
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test6.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test4.lua', true))()
