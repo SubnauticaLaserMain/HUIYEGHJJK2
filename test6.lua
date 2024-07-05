@@ -10,7 +10,7 @@ if game.PlaceId == 1537690962 then
 
 
     local Window = GuiLibrary:CreateWindow({
-        Name = 'Library - BSS (Bee Swarm Simulator) | Version v1.1',
+        Name = 'Library - BSS (Bee Swarm Simulator) | Version v1.2',
         Themeable = {
             Info = "My friend wanted it, he gets it LOL"
         }
@@ -44,7 +44,7 @@ if game.PlaceId == 1537690962 then
         }),
 
         ['EnemySpawnsESP'] = ESPTab:CreateSection({
-            Name = 'Enemy-Spawner-ESP'
+            Name = 'Enemy-Spawner-ESP [BETA]'
         })
     }
 
@@ -131,6 +131,18 @@ if game.PlaceId == 1537690962 then
         Name = 'Actions'
     })
 
+
+
+    Actions:AddButton({
+        Name = 'Toggle Make Honey',
+        Callback = function()
+            local args = {
+                [1] = 'ToggleHoneyMaking'
+            }
+            
+            game:GetService('ReplicatedStorage').Events.PlayerHiveCommand:FireServer(unpack(args))            
+        end
+    })
 
 
     local DoLooperEnabled = false
@@ -236,7 +248,7 @@ if game.PlaceId == 1537690962 then
         end
     })
 
-    ESP_Tabs['EnemySpawnsESP']:AddToggle({
+    ESP_Tabs['EnemySpawnsESP']:AddColorPicker({
         Name = 'ESP Color',
         Callback = function(Color)
             MonsterESPOptions['Color'] = Color
