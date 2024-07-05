@@ -37,6 +37,14 @@ if game.PlaceId == 1537690962 then
 
         ['BeeSection'] = ESPTab:CreateSection({
             Name = 'Bee-Section'
+        }),
+
+        ['EnemyESP'] = ESPTab:CreateSection({
+            Name = 'Enemy-ESP'
+        }),
+
+        ['EnemySpawnsESP'] = ESPTab:CreateSection({
+            Name = 'Enemy-Spawner-ESP'
         })
     }
 
@@ -144,6 +152,100 @@ if game.PlaceId == 1537690962 then
             end
         end
     })
+
+
+
+
+
+    local MonsterSpawnerFolder = workspace:WaitForChild('MonsterSpawners', 60)
+
+
+    local MonsterESPOptions = {
+        ['Color'] = Color3.new(1, 1, 1),
+        ['Enabled'] = false
+    }
+
+
+    local function ApplyMonsterSpawnerESP()
+        if MonsterESPOptions['Enabled'] == true then
+            for i, v in MonsterSpawnerFolder:GetChildren() do
+                if v and not v:FindFirstChild('ESP') then
+                    local ESP = Instance.new('Highlight', v)
+                    ESP.Name = 'ESP'
+                    ESP.FillColor = MonsterESPOptions['Color']
+                end
+            end
+        end
+    end
+
+
+    local function RemoveMonsterSpawnerESP()
+        for i, v in MonsterSpawnerFolder:GetChildren() do
+            if v and v:FindFirstChild('ESP') then
+                v.ESP:Destroy()
+            end
+        end
+    end
+
+
+
+    local function AddESPMonsterSpawner(Spawner)
+        if Spawner and MonsterESPOptions['Enabled'] then
+            if not Spawner:FindFirstChild('ESP') then
+                local ESP = Instance.new('Highlight', Spawner)
+                ESP.Name = 'ESP'
+                ESP.FillColor = MonsterESPOptions['Color']
+            end
+        end
+    end
+
+
+    local function RemoveESPSpawner(Spawner)
+        if Spawner then
+            if Spawner:FindFirstChild('ESP') then
+                Spawner.ESP:Destroy()
+            end
+        end
+    end
+
+
+    local function UpdateMonsterSpawnerESP()
+        if MonsterESPOptions['Enabled'] == true then
+            for i, v in MonsterSpawnerFolder:GetChildren() do
+                if v and v:FindFirstChild('ESP') then
+                    v.Color = MonsterESPOptions['Color']
+                end
+            end
+        end
+    end
+
+
+
+
+    ESP_Tabs['EnemySpawnsESP']:AddToggle({
+        Name = 'Enemy ESP',
+        Value = false,
+        Callback = function(Toggled)
+            MonsterESPOptions['Enabled'] = Toggled
+
+            if Toggled == true then
+                ApplyMonsterSpawnerESP()
+            else
+                RemoveMonsterSpawnerESP()
+            end
+        end
+    })
+
+    ESP_Tabs['EnemySpawnsESP']:AddToggle({
+        Name = 'ESP Color',
+        Callback = function(Color)
+            MonsterESPOptions['Color'] = Color
+        end
+    })
+
+
+    MonsterSpawnerFolder.ChildAdded:Connect(AddESPMonsterSpawner)
+    MonsterSpawnerFolder.ChildRemoved:Connect(RemoveESPSpawner)
 else
     local Window = GuiLibrary:CreateWindow({
         Name = 'Library - Piggy | Version v1.1',
