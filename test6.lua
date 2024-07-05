@@ -4,6 +4,11 @@ local PlayerService = game:GetService('Players')
 
 
 if game.PlaceId == 1537690962 then
+    local BSS_Storage = {
+        ['ToolCollect'] = game:GetService("ReplicatedStorage").Events.ToolCollect
+    }
+
+
     local Window = GuiLibrary:CreateWindow({
         Name = 'Library - BSS (Bee Swarm Simulator) | Version v1.1',
         Themeable = {
@@ -60,7 +65,7 @@ if game.PlaceId == 1537690962 then
 
 
     local function AddBeeESP_Object(Bee)
-        if Bee then
+        if Bee and ESP_Options['Enabled'] then
             if not Bee:FindFirstChild('ESP') then
                 local ESP = Instance.new('Highlight', Bee)
                 ESP.Name = 'ESP'
@@ -82,15 +87,63 @@ if game.PlaceId == 1537690962 then
 
     local BeeFolder = workspace:WaitForChild('Bees', 60)
 
-    for i, v in BeeFolder:GetChildren() do
-        if v then
-            AddBeeESP_Object(v)
-        end
-    end
+
 
 
     BeeFolder.ChildAdded:Connect(AddBeeESP_Object)
     BeeFolder.ChildRemoved:Connect(RemoveBeeESP_Object)
+
+
+
+
+    ESP_Tabs['BeeSection']:AddToggle({
+        Name = 'Bee ESP',
+        Value = false,
+        Callback = function(Toggled)
+            ESP_Options['Enabled'] = Toggled
+
+            if Toggled == true then
+                for i, v in BeeFolder:GetChildren() do
+                    if v and not v:FindFirstChild('ESP') then
+                        AddBeeESP_Object(v)
+                    end
+                end
+            else
+                for i, v in BeeFolder:GetChildren() do
+                    if v and v:FindFirstChild('ESP') then
+                        RemoveBeeESP_Object(v)
+                    end
+                end
+            end
+        end
+    })
+
+
+    local Actions = GeneralTab:CreateSection({
+        Name = 'Actions'
+    })
+
+
+
+    local DoLooperEnabled = false
+    local function DoLooper()
+        while DoLooperEnabled == true and wait(0.3) do
+            game:GetService("ReplicatedStorage").Events.ToolCollect:FireServer()
+        end
+    end
+
+
+    Actions:AddToggle({
+        Name = 'Auto-Collect',
+        Value = false,
+        Callback = function(Toggle)
+            DoLooperEnabled = Toggle
+
+            if Toggle == true then
+                DoLooper()
+            end
+        end
+    })
 else
     local Window = GuiLibrary:CreateWindow({
         Name = 'Library - Piggy | Version v1.1',
@@ -380,4 +433,4 @@ else
     end)
 
 end
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test4.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test6.lua', true))()
