@@ -76,13 +76,17 @@ local function RemoveAllESP()
 
 
     for i, v in pairs(Players) do
-        if v ~= Players.LocalPlayer then
-            local Character = v.Character and v.CharacterAdded:Wait()
+        if v ~= PlayerService.LocalPlayer then
+            local Character = v.Character or v.CharacterAdded:Wait()
 
             if Character and Character:FindFirstChild('ESP') then
-                local ESP = Character:FindFirstChild('ESP')
+                local ESP = Character.ESP;
 
                 ESP:Destroy()
+
+                print('Removing ESP Object from: ' .. tostring(Character:GetFullName()))
+                
+
                 ESP_Table_Players[v.Name] = nil
             end
         end
@@ -93,15 +97,17 @@ end
 
 
 local function AddESP_Player(Player: Player)
-    if Player and Player.ClassName == 'Player' and Player ~= PlayerService.LocalPlayer then
-        local Character = Player.Character or Player.CharacterAdded:Wait()
+    if ESP_Options['Enabled'] == true then
+        if Player and Player.ClassName == 'Player' and Player ~= PlayerService.LocalPlayer then
+            local Character = Player.Character or Player.CharacterAdded:Wait()
 
-        if Character and not Character:FindFirstChild('ESP') then
-            local ESP = Instance.new('Highlight', Character)
-            ESP.Name = 'ESP'
-            ESP.FillColor = ESP_Options['Color']
+            if Character and not Character:FindFirstChild('ESP') then
+                local ESP = Instance.new('Highlight', Character)
+                ESP.Name = 'ESP'
+                ESP.FillColor = ESP_Options['Color']
 
-            ESP_Table_Players[Player.Name] = ESP
+                ESP_Table_Players[Player.Name] = ESP
+            end
         end
     end
 end
@@ -119,6 +125,25 @@ local function RemoveESP_Player(Player: Player)
     end
 end
 
+
+
+
+local function UpdateESP_ObjectPlayer()
+    local Players = PlayerService:GetPlayers()
+
+
+    for i, v in pairs(Players) do
+        if v ~= PlayerService.LocalPlayer then
+            local Character = v.Character or v.CharacterAdded:Wait()
+
+            if Character and Character:FindFirstChild('ESP') then
+                local ESP = Character.ESP;
+                ESP.FillColor = ESP_Options['Color']
+
+            end
+        end
+    end
+end
 
 
 
@@ -156,6 +181,7 @@ local PlayerESP_ColorPicker_ESPColor = ESP_Tabs['PlayerSection']:AddColorPicker(
     Flag = 'ESP-Color-Body-Picker',
     Callback = function(Color)
         ESP_Options['Color'] = Color
+        UpdateESP_ObjectPlayer()
     end
 })
 
