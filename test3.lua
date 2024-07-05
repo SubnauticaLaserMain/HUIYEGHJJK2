@@ -209,11 +209,15 @@ local Items = {}
 local IsEnabled = false
 
 local function OnItemAdded(Item)
+    print('Target item: ' .. tostring(Item))
     if Item and IsEnabled == true then
         if Item:FindFirstChild('ItemPickupScript') and Item:FindFirstChild('ClickDetector') then
-            local ESP = Instance.new('Highlight', Item)
-            ESP.Name = 'ESP'
-            ESP.FillColor = Color3.fromHex(Item.Color:ToHex())        
+            if not Item:FindFirstChild('ESP') then
+                local ESP = Instance.new('Highlight', Item)
+                ESP.Name = 'ESP'
+                ESP.FillColor = Color3.fromHex(Item.Color:ToHex())        
+                print('Step is adding ItemESP to: ' .. tostring(ESP:GetFullName()))
+            end
         end
     end
 end
@@ -301,4 +305,4 @@ ItemsFolder.ChildRemoved:Connect(function(child)
 end)
 
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test2.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test4.lua', true))()
