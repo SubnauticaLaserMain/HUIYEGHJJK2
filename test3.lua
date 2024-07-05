@@ -211,11 +211,9 @@ local IsEnabled = false
 local function OnItemAdded(Item)
     if Item and IsEnabled == true then
         if Item:FindFirstChild('ItemPickupScript') and Item:FindFirstChild('ClickDetector') then
-            if not Item:FindFirstChild('ESP') then
-                local ESP = Instance.new('Highlight', Item)
-                ESP.Name = 'ESP'
-                ESP.FillColor = Color3.fromHex(Item.Color:ToHex())
-            end
+            local ESP = Instance.new('Highlight', Item)
+            ESP.Name = 'ESP'
+            ESP.FillColor = Color3.fromHex(Item.Color:ToHex())        
         end
     end
 end
@@ -237,6 +235,7 @@ local function ApplyToAll()
                 local ESP = Instance.new('Highlight', v)
                 ESP.Name = 'ESP'
                 ESP.FillColor = Color3.fromHex(v.Color:ToHex())
+                print('Applying ESP to item Name: ' .. tostring(v.Name))
             end
         end
     end
@@ -264,21 +263,42 @@ end
 
 
 
+local function UpdateItemTable()
+    Items = {}
+
+    for i, v in ItemsFolder:GetChildren() do
+        if v and v:FindFirstChild('ItemPickupScript') and v:FindFirstChild('ClickDetector') then
+            Items[v.Name] = v
+        end
+    end
+end
+
+
+
+
 ESP_Tabs['ItemSection']:AddToggle({
     Name = 'Item ESP',
     Flag = 'Item-ESP-Body-Enabled-Toggle',
-    Callback = function(Toggle)
+    Callback = function(Toggle)    
+        UpdateItemTable()
         IsEnabled = Toggle
         ToggleItemESP(IsEnabled)
     end
 })
 
 
-
-ItemsFolder.ChildAdded:Connect(OnItemAdded)
-ItemsFolder.ChildRemoved:Connect(OnItemRemoved)
+UpdateItemTable()
 
 
+ItemsFolder.ChildAdded:Connect(function(child)
+    UpdateItemTable()
+    OnItemAdded(child)
+    print('Item added: ' .. tostring(child.Name) .. ' {HasESP: ' .. tostring(child:FindFirstChild('ESP')) .. '}')
+end)
+ItemsFolder.ChildRemoved:Connect(function(child)
+    UpdateItemTable()
+    OnItemRemoved(child)
+end)
 
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test3.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test2.lua', true))()
