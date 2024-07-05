@@ -26,6 +26,10 @@ local ESP_Tabs = {
 
     ['PlayerSection'] = ESPTab:CreateSection({
         Name = 'Player-Section'
+    }),
+
+    ['ItemSection'] = ESPTab:CreateSection({
+        Name = 'Item-Section'
     })
 }
 
@@ -77,12 +81,16 @@ local function RemoveAllESP()
 
     for i, v in pairs(Players) do
         if v ~= PlayerService.LocalPlayer then
-            local Character = v.Character and v.CharacterAdded:Wait()
+            local Character = v.Character or v.CharacterAdded:Wait()
 
             if Character and Character:FindFirstChild('ESP') then
-                local ESP = Character:FindFirstChild('ESP')
+                local ESP = Character.ESP;
 
                 ESP:Destroy()
+
+                print('Removing ESP Object from: ' .. tostring(Character:GetFullName()))
+                
+
                 ESP_Table_Players[v.Name] = nil
             end
         end
@@ -93,15 +101,17 @@ end
 
 
 local function AddESP_Player(Player: Player)
-    if Player and Player.ClassName == 'Player' and Player ~= PlayerService.LocalPlayer then
-        local Character = Player.Character or Player.CharacterAdded:Wait()
+    if ESP_Options['Enabled'] == true then
+        if Player and Player.ClassName == 'Player' and Player ~= PlayerService.LocalPlayer then
+            local Character = Player.Character or Player.CharacterAdded:Wait()
 
-        if Character and not Character:FindFirstChild('ESP') then
-            local ESP = Instance.new('Highlight', Character)
-            ESP.Name = 'ESP'
-            ESP.FillColor = ESP_Options['Color']
+            if Character and not Character:FindFirstChild('ESP') then
+                local ESP = Instance.new('Highlight', Character)
+                ESP.Name = 'ESP'
+                ESP.FillColor = ESP_Options['Color']
 
-            ESP_Table_Players[Player.Name] = ESP
+                ESP_Table_Players[Player.Name] = ESP
+            end
         end
     end
 end
@@ -119,6 +129,25 @@ local function RemoveESP_Player(Player: Player)
     end
 end
 
+
+
+
+local function UpdateESP_ObjectPlayer()
+    local Players = PlayerService:GetPlayers()
+
+
+    for i, v in pairs(Players) do
+        if v ~= PlayerService.LocalPlayer then
+            local Character = v.Character or v.CharacterAdded:Wait()
+
+            if Character and Character:FindFirstChild('ESP') then
+                local ESP = Character.ESP;
+                ESP.FillColor = ESP_Options['Color']
+
+            end
+        end
+    end
+end
 
 
 
@@ -156,9 +185,121 @@ local PlayerESP_ColorPicker_ESPColor = ESP_Tabs['PlayerSection']:AddColorPicker(
     Flag = 'ESP-Color-Body-Picker',
     Callback = function(Color)
         ESP_Options['Color'] = Color
+        UpdateESP_ObjectPlayer()
     end
 })
 
 
+local ItemsFolder = (function()
+    local Location = workspace;
+    local Trash = {'GameFolder', 'LoadedMap', 'PiggyNPC'}
+    local Type = 'Folder'
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test5.lua', true))()
+    for i, v in Location:GetChildren() do
+        if v.ClassName == Type and not table.find(Trash, v.Name) then
+            return v
+        end
+    end
+end)()
+
+
+local Items = {}
+
+
+local IsEnabled = false
+
+local function OnItemAdded(Item)
+    if Item and IsEnabled == true then
+        if Item:FindFirstChild('ItemPickupScript') and Item:FindFirstChild('ClickDetector') then
+            if not Item:FindFirstChild('ESP') then
+                local ESP = Instance.new('Highlight', Item)
+                ESP.Name = 'ESP'
+                ESP.FillColor = Color3.fromHex(Item.Color:ToHex())
+            end
+        end
+    end
+end
+
+local function OnItemRemoved(Item)
+    if Item then
+        if Item:FindFirstChild('ItemPickupScript') and Item:FindFirstChild('ClickDetector') then
+            if Item:FindFirstChild('ESP') then
+                Item.ESP:Destroy()
+            end
+        end
+    end
+end
+
+local function ApplyToAll()
+    for i, v in pairs(Items) do
+        if v and v:FindFirstChild('ItemPickupScript') and v:FindFirstChild('ClickDetector') then
+            if not v:FindFirstChild('ESP') then
+                local ESP = Instance.new('Highlight', v)
+                ESP.Name = 'ESP'
+                ESP.FillColor = Color3.fromHex(v.Color:ToHex())
+                print('Applying ESP to item Name: ' .. tostring(v.Name))
+            end
+        end
+    end
+end
+
+local function RemoveToAll()
+    for i, v in pairs(Items) do
+        if v and v:FindFirstChild('ItemPickupScript') and v:FindFirstChild('ClickDetector') then
+            if v:FindFirstChild('ESP') then
+                v.ESP:Destroy()
+            end
+        end
+    end
+end
+
+
+
+local function ToggleItemESP(Toggled)
+    if Toggled == true then
+        ApplyToAll()
+    else
+        RemoveToAll()
+    end
+end
+
+
+
+local function UpdateItemTable()
+    for i, v in ItemsFolder:GetChildren() do
+        if v and v:FindFirstChild('ItemPickupScript') and v:FindFirstChild('ClickDetector') then
+            Items[v.Name] = v
+        end
+    end
+end
+
+
+
+
+ESP_Tabs['ItemSection']:AddToggle({
+    Name = 'Item ESP',
+    Flag = 'Item-ESP-Body-Enabled-Toggle',
+    Callback = function(Toggle)
+        UpdateItemTable()
+        IsEnabled = Toggle
+        ToggleItemESP(IsEnabled)
+    end
+})
+
+
+UpdateItemTable()
+
+
+ItemsFolder.ChildAdded:Connect(function(child)
+    UpdateItemTable()
+    OnItemAdded(child)
+end)
+ItemsFolder.ChildRemoved:Connect(function(child)
+    UpdateItemTable()
+    OnItemRemoved(child)
+end)
+
+
+
+
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/HUIYEGHJJK2/main/test4.lua', true))()
